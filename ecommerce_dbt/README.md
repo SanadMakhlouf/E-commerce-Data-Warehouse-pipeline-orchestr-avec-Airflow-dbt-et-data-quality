@@ -1,15 +1,34 @@
-Welcome to your new dbt project!
+# ecommerce_dbt
 
-### Using the starter project
+Transformations SQL du pipeline e-commerce (staging + star schema).
 
-Try running the following commands:
-- dbt run
-- dbt test
+## Prerequis
 
+- PostgreSQL avec la base `ecommerce_db`
+- Table `raw_orders` remplie via `python ingestion/load_raw.py` (depuis la racine du repo)
+- Profil dbt : copier `profiles.yml.example` vers `~/.dbt/profiles.yml`
 
-### Resources:
-- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
-- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
-- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
-- Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+## Commandes
+
+Depuis ce dossier (`ecommerce_dbt/`), avec le venv active a la racine :
+
+```powershell
+..\venv\Scripts\dbt.exe debug
+..\venv\Scripts\dbt.exe run
+..\venv\Scripts\dbt.exe test
+..\venv\Scripts\dbt.exe docs generate
+..\venv\Scripts\dbt.exe docs serve
+```
+
+## Modeles
+
+| Couche | Modele | Role |
+|--------|--------|------|
+| Source | `raw.raw_orders` | Donnees brutes CSV |
+| Staging | `stg_orders` | Nettoyage, filtres metier |
+| Mart | `dim_products` | SKUs uniques |
+| Mart | `dim_locations` | Lieux de livraison |
+| Mart | `dim_dates` | Calendrier |
+| Mart | `fact_sales` | Lignes de vente + cles etrangeres |
+
+Les transformations Python dans `transformation/build_star_schema.py` ne sont plus utilisees : **dbt est la source de verite**.

@@ -1,0 +1,15 @@
+# Copier vers %USERPROFILE%\.dbt\profiles.yml (Windows)
+# ou ~/.dbt/profiles.yml (Linux/macOS), puis adapter user/password.
+
+ecommerce_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      port: 5432
+      user: postgres
+      password: YOUR_PASSWORD
+      dbname: ecommerce_db
+      schema: public
+      threads: 4

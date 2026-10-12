@@ -1,3 +1,5 @@
+# Legacy : meme logique que ecommerce_dbt (staging + marts).
+# Ne plus utiliser au quotidien — lancer dbt run a la place.
 import sys
 from pathlib import Path
 

@@ -1,12 +1,77 @@
+version: 2
+
 models:
   - name: dim_products
+    description: Dimension produit (grain SKU).
     columns:
+      - name: product_id
+        tests:
+          - unique
+          - not_null
       - name: sku
         tests:
           - unique
           - not_null
-  - name: fact_sales
+
+  - name: dim_locations
+    description: Dimension lieu de livraison (ville, etat, pays).
     columns:
+      - name: location_id
+        tests:
+          - unique
+          - not_null
+      - name: ship_city
+        tests:
+          - not_null
+      - name: ship_state
+        tests:
+          - not_null
+      - name: ship_country
+        tests:
+          - not_null
+
+  - name: dim_dates
+    description: Dimension calendrier (une ligne par date de commande).
+    columns:
+      - name: date_id
+        tests:
+          - unique
+          - not_null
+      - name: order_date
+        tests:
+          - unique
+          - not_null
+
+  - name: fact_sales
+    description: Faits ventes lies aux dimensions produit, lieu et date.
+    columns:
+      - name: order_id
+        tests:
+          - not_null
       - name: product_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: product_id
+      - name: location_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_locations')
+                field: location_id
+      - name: date_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_dates')
+                field: date_id
+      - name: qty
+        tests:
+          - not_null
+      - name: amount
         tests:
           - not_null

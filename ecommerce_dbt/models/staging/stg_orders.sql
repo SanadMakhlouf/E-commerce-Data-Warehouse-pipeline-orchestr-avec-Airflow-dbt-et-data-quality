@@ -19,3 +19,6 @@ WHERE "Status" ILIKE '%Shipped%'
     AND "Amount" IS NOT NULL
     AND "Qty" > 0
     AND "Amount" > 0
+    AND "ship-city" IS NOT NULL
+    AND "ship-state" IS NOT NULL
+    AND "ship-country" IS NOT NULL

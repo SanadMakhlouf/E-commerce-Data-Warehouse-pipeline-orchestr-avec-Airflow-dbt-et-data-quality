@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: Commandes expédiees nettoyees, une ligne par article de commande.
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+      - name: order_date
+        tests:
+          - not_null
+      - name: sku
+        tests:
+          - not_null
+      - name: qty
+        tests:
+          - not_null
+      - name: amount
+        tests:
+          - not_null
