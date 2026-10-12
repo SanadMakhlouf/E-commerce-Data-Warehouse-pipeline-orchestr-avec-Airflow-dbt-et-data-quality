@@ -1,0 +1,57 @@
+# Postgres = metadonnees Airflow uniquement (pas ecommerce_db / dbt).
+# UI : http://localhost:8080 (identifiants affiches dans les logs au 1er standalone)
+
+x-airflow-common: &airflow-common
+  build: ./airflow
+  environment: &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:-46BKJoQYlFDeTVZHSLwPmS_lk0Z79HMuZ6RYyQaJqgI=}
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session
+    # Postgres metier sur la machine hote (pas localhost dans le conteneur)
+    DATABASE_URL: ${ECOMMERCE_DATABASE_URL:-postgresql://postgres:root@host.docker.internal:5432/ecommerce_db}
+  volumes:
+    - ./airflow/dags:/opt/airflow/dags
+    - ./:/opt/airflow/project
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  airflow:
+    <<: *airflow-common
+    command: standalone
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8080:8080"
+    environment:
+      <<: *airflow-common-env
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+volumes:
+  postgres-db-volume:
